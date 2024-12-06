@@ -67,11 +67,6 @@ const Documents = () => {
     const commentRef = ref(database, `comments/${agendaId}/${originalAuthorId}/${commenterId}`);
     set(commentRef, comment)
       .then(() => {
-        // 댓글을 작성한 직후, 새로운 댓글을 댓글 목록에 추가
-        setComments(prevComments => ({
-          ...prevComments,
-          [commenterId]: comment,
-        }));
         setCurrentComment(''); // 댓글 작성 후 입력창 초기화
         alert('댓글이 저장되었습니다.');
       })
@@ -192,7 +187,7 @@ const Documents = () => {
                       댓글 작성
                     </button>
 
-                    {/* 댓글 바로 표시 (스크롤 형식) */}
+                    {/* 댓글 표시 (스크롤 형식) */}
                     <div className="mt-4 max-h-32 overflow-y-auto">
                       {Object.entries(comments).map(([commenterId, comment]) => (
                         <div key={commenterId} className="mt-2">
@@ -207,6 +202,41 @@ const Documents = () => {
             ) : (
               <p>안건이 없습니다.</p>
             )}
+          </div>
+        )}
+      </div>
+
+      {/* 우측 사이드바 영역 (참여자 목록 및 버튼 포함) */}
+      <div className={`bg-gray p-4 ${isSidebarOpen ? 'w-[25vw]' : 'w-0'} transition-all flex flex-col gap-4`}>
+        <h1 className="text-xl font-bold text-black mb-4">Participants</h1>
+
+        {/* 참여자 목록 표시 */}
+        <div className="flex flex-col gap-4">
+          {participants.map((participant, index) => (
+            <div key={participant.id} className="flex justify-between items-center">
+              <div>{participant.name}</div>
+              <button
+                onClick={() => {
+                  if (index === 0) {
+                    handleWriteParticipant(participant); // 첫 번째 참여자일 경우 작성 버튼 클릭
+                  } else {
+                    handleViewParticipant(participant); // 나머지 참여자는 열람
+                  }
+                }}
+                className="border-2 border-blue-500 text-blue-500 px-3 py-2 rounded-lg hover:bg-primary hover:text-white transition-colors"
+              >
+                {index === 0 ? '작성' : '열람'}
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {/* 선택된 참여자 정보 표시 */}
+        {selectedParticipant && (
+          <div className="bg-white p-6 rounded-lg shadow-lg mt-6">
+            <h3 className="text-xl font-bold">참여자 세부 정보</h3>
+            <p><strong>이름:</strong> {selectedParticipant.name}</p>
+            <p><strong>이메일:</strong> {selectedParticipant.email}</p>
           </div>
         )}
       </div>
